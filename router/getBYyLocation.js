@@ -1,4 +1,5 @@
-const data = require("./data.json");
+const { getDatabase } = require("../db/db");
+const http = require("../enum/statusCode");
 
 module.exports = getBYyLocation = async (req, res) => {
   try {
@@ -7,37 +8,49 @@ module.exports = getBYyLocation = async (req, res) => {
     console.info("Name of the Asset : ", assetName);
     console.info("Name of the location : ", location);
 
-    if (!(assetName in data)) {
-      const validAssetNames = Object.keys(data).join(", ");
-      const errorMessage = `Please enter a valid asset names :  ${validAssetNames}`;
+    const db = getDatabase();
+    const collections = await db.listCollections().toArray();
+    const collectionNames = collections.map((collection) => collection.name);
+
+    if (!collectionNames.includes(assetName)) {
+      const errorMessage = `Please enter a valid asset names :  ${collectionNames}`;
       console.error(errorMessage);
 
-      return res.status(404).json({
-        statusCode: 404,
+      return res.status(http.NOT_FOUND).json({
+        statusCode: http.NOT_FOUND,
         time: new Date().toISOString(),
         errMessage: errorMessage,
       });
     }
 
-    const foundObjects = data[assetName].filter(
-      (obj) =>
-        obj?.Location?.toLowerCase().trim() === location?.toLowerCase().trim()
-    );
+    const assetCollection = db.collection(assetName);
+    const query = { Location: { $regex: location, $options: "i" } };
 
-    if (foundObjects.length === 0) {
+    const data = await assetCollection.find(query).toArray();
+
+    if (data?.length === 0) {
       const errorMessage = `There is no data for the asset ${assetName} in the location ${location}.`;
       console.error(errorMessage);
 
-      return res.status(404).json({
-        statusCode: 404,
+      return res.status(http.NOT_FOUND).json({
+        statusCode: http.NOT_FOUND,
         time: new Date().toISOString(),
         errMessage: errorMessage,
       });
     }
 
-    return res.status(200).send(foundObjects);
+    return res.status(http.SUCCESS).json({
+      statusCode: http.SUCCESS,
+      time: new Date().toISOString(),
+      data: data,
+    });
   } catch (error) {
-    console.log(error);
-    return res.status(500).send(error);
+    console.error(error);
+
+    return res.status(http.INTERNAL_SERVER_ERROR).json({
+      statusCode: http.INTERNAL_SERVER_ERROR,
+      time: new Date().toISOString(),
+      error: error,
+    });
   }
 };
