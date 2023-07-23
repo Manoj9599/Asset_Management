@@ -1,5 +1,5 @@
 const http = require("../enum/statusCode");
-
+require("dotenv").config();
 const basicAuth = (req, res, next) => {
   const authHeader = req.headers["authorization"];
 
