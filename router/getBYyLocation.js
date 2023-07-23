@@ -9,11 +9,14 @@ module.exports = getBYyLocation = async (req, res) => {
 
     const hasMobile = data.hasOwnProperty(assetName);
 
-    if (!hasMobile) {
-      return res
-        .status(404)
-        .send(`Please enter the valid asset name : ${Object.keys(data)}`);
+       if (!hasMobile) {
+      return res.status(404).json({
+        statusCode: 404,
+        time: new Date().toISOString(),
+        errMessage: `Please enter the valid asset name : ${Object.keys(data)}`,
+      });
     }
+
 
     const foundObjects = data[assetName].filter(
       (obj) =>
@@ -21,12 +24,14 @@ module.exports = getBYyLocation = async (req, res) => {
     );
 
     if (foundObjects?.length === 0) {
-       console.log(`There is no data for the asset ${assetName} belongs to the location ${location}`);
-      return res
-        .status(404)
-        .send(
-          `There is no data for the asset ${assetName} belongs to the location ${location}`
-        );
+      console.log(
+        `There is no data for the asset ${assetName} belongs to the location ${location}`
+      );
+      return res.status(404).json({
+        statusCode: 404,
+        time: new Date().toISOString(),
+        errMessage: `There is no data for the asset ${assetName} belongs to the location ${location}`,
+      });
     }
 
     return res.status(200).send(foundObjects);
