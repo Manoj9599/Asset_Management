@@ -20,15 +20,12 @@ module.exports = getBYyLocation = async (req, res) => {
         obj?.Location?.toLowerCase().trim() === location?.toLowerCase().trim()
     );
 
-    console.log(
-      `There is no data for the asset ${assetName} and  location ${location}`
-    );
-
     if (foundObjects?.length === 0) {
+       console.log(`There is no data for the asset ${assetName} belongs to the location ${location}`);
       return res
         .status(404)
         .send(
-          `There is no data for the asset ${assetName} and  location ${location}`
+          `There is no data for the asset ${assetName} belongs to the location ${location}`
         );
     }
 
