@@ -4,34 +4,34 @@ module.exports = getBYyLocation = async (req, res) => {
   try {
     const { assetName, location } = req.params;
 
-    console.log("Name of the Asset : ", assetName);
-    console.log("Name of the location : ", location);
+    console.info("Name of the Asset : ", assetName);
+    console.info("Name of the location : ", location);
 
-    const hasMobile = data.hasOwnProperty(assetName);
+    if (!(assetName in data)) {
+      const validAssetNames = Object.keys(data).join(", ");
+      const errorMessage = `Please enter a valid asset names :  ${validAssetNames}`;
+      console.error(errorMessage);
 
-       if (!hasMobile) {
-        console.log(`Please enter the valid asset name : ${Object.keys(data)}`);
       return res.status(404).json({
         statusCode: 404,
         time: new Date().toISOString(),
-        errMessage: `Please enter the valid asset name : ${Object.keys(data)}`,
+        errMessage: errorMessage,
       });
     }
-
 
     const foundObjects = data[assetName].filter(
       (obj) =>
         obj?.Location?.toLowerCase().trim() === location?.toLowerCase().trim()
     );
 
-    if (foundObjects?.length === 0) {
-      console.log(
-        `There is no data for the asset ${assetName} belongs to the location ${location}`
-      );
+    if (foundObjects.length === 0) {
+      const errorMessage = `There is no data for the asset ${assetName} in the location ${location}.`;
+      console.error(errorMessage);
+
       return res.status(404).json({
         statusCode: 404,
         time: new Date().toISOString(),
-        errMessage: `There is no data for the asset ${assetName} belongs to the location ${location}`,
+        errMessage: errorMessage,
       });
     }
 
