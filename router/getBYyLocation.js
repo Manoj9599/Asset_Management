@@ -4,12 +4,13 @@ module.exports = getBYyLocation = async (req, res) => {
   try {
     const { assetName, location } = req.params;
 
-    console.log(assetName, "Name of the Asset");
-    console.log(location, "Name of the location");
+    console.log("Name of the Asset : ", assetName);
+    console.log("Name of the location : ", location);
 
     const hasMobile = data.hasOwnProperty(assetName);
 
        if (!hasMobile) {
+        console.log(`Please enter the valid asset name : ${Object.keys(data)}`);
       return res.status(404).json({
         statusCode: 404,
         time: new Date().toISOString(),
